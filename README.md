@@ -2,4 +2,5 @@
 
 ## Collaboratos
 
-`johnson_m` - Mathius Johnson
+`johnson_m`
+`aubin_t`
