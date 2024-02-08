@@ -1,51 +1,30 @@
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <stdlib.h>
 #include <my_bsq.h>
 
-int my_bsq(char *filename) {
+int my_bsq(char *file) {
     char *buffer;
     ssize_t bytes_read;
-
-    int result = read_file(filename, &buffer, &bytes_read);
-    if (result != 0) {
-        printf("Failed to read file.\n");
-        return 1;
+    int result = read_file(file, &buffer, &bytes_read);
+    if (result){
+        return result;
     }
-
-    printf("Content read from the file:\n");
     write(STDOUT_FILENO, buffer, bytes_read);
     printf("\n");
     char **matrix;
     int rows, cols;
-
     result = parse_buffer_to_matrix(buffer, bytes_read, &matrix, &rows, &cols);
-
-    if (result != 0) {
+    if (result){
         printf("Failed to parse buffer to matrix.\n");
         free(buffer);
-        return 1;
+        return result;
     }
-
-
     free(buffer);
-
     return 0;
 }
 
-
 int main(int ac , char **av){
-
     if (ac == 2){
-        printf("Received map: %s\n", av[1]);
+        return my_bsq(av[1]);
     }
-    else {
-        printf(HELP);
-    }
-
-    my_bsq(av[1]);
-
+    printf(HELP);
     return EXIT_SUCCESS;
 }
