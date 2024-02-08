@@ -10,4 +10,6 @@ my_bsq [file.txt] ...\n"
 
 int read_file(char *filename, char **buffer, ssize_t *bytes_read);
 
+int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read, char ***matrix, int *rows, int *cols);
+
 #endif

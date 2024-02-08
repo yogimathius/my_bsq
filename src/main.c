@@ -17,6 +17,18 @@ int my_bsq(char *filename) {
 
     printf("Content read from the file:\n");
     write(STDOUT_FILENO, buffer, bytes_read);
+    printf("\n");
+    char **matrix;
+    int rows, cols;
+
+    result = parse_buffer_to_matrix(buffer, bytes_read, &matrix, &rows, &cols);
+
+    if (result != 0) {
+        printf("Failed to parse buffer to matrix.\n");
+        free(buffer);
+        return 1;
+    }
+
 
     free(buffer);
 
