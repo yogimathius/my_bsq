@@ -5,20 +5,14 @@
 #include <stdlib.h>
 #include <my_bsq.h>
 
-int main(int ac , char **av){
+int my_bsq(char *filename){
     int fd;
     char *buffer;
     ssize_t bytes_read;
     struct stat file_stat;
 
-    if (ac == 2){
-        printf("Received map: %s\n", av[1]);
-    }
-    else {
-        printf(HELP);
-    }
 
-    fd = open(av[1], O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd == -1) {
         perror("Error opening the file");
         return 1;
@@ -56,6 +50,20 @@ int main(int ac , char **av){
     }
 
     free(buffer);
+
+    return 0;
+}
+
+int main(int ac , char **av){
+
+    if (ac == 2){
+        printf("Received map: %s\n", av[1]);
+    }
+    else {
+        printf(HELP);
+    }
+
+    my_bsq(av[1]);
 
     return EXIT_SUCCESS;
 }
