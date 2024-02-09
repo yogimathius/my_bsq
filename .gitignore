@@ -88,3 +88,4 @@ dkms.conf
 *.out
 *.app
 
+.vscode
