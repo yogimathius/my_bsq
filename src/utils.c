@@ -28,39 +28,56 @@ int read_file(char *file, char **buffer, ssize_t *bytes_read){
     return 0;
 }
 
-void build_matrix(char *buffer, char ***matrix, int rows, int cols, ssize_t bytes_read){
+void build_matrix(const char *buffer, int rows, int cols, ssize_t bytes_read){
     int k = 0;
     int i = 0;
-    int j;
-
+    int **results = malloc(rows * sizeof(int *));
+    for (int p = 0; p < rows; p++) {
+        results[p] = malloc(cols * sizeof(int));
+    }
     while (i < rows){
-        j = 0;
+        int j = 0;
         while (j < cols) {
-            if (k < bytes_read) {
-                if (buffer[k] != '\n') {
-                    (*matrix)[i][j] = buffer[k];
+            if (i == 0) {
+                results[i][j] = (buffer[k] == 'o') ? 1 : 0;
+            } else if (j == 0) {
+                results[i][j] = (buffer[k] == 'o') ? 1 : 0;
+            } else {
+                if (buffer[k] == 'o') {
+                    int above = results[i - 1][j];
+                    int left = results[i][j - 1];
+                    int left_diagonal = results[i - 1][j - 1];
+                    results[i][j] = above + left + left_diagonal + 1;
+                } else {
+                    results[i][j] = 0;
                 }
-                else {
+            } 
+            if (k < bytes_read) {
+                if (buffer[k] == '\n') {
                     j -= 1;
                 }
                 k += 1;
-            }
-            else {
-                (*matrix)[i][j] = ' ';
             }
             j += 1;
         }
         i += 1;
     }
+
+    for (int m = 0; m < rows; m++) {
+        for (int n = 0; n < cols; n++) {
+            printf("%d ", results[m][n]);
+        }
+        printf("\n");
+    }
 }
 
-void print_matrix(char **matrix, int rows, int cols) {
+void print_matrix(int **matrix, int rows, int cols) {
     int i = 0;
     int j = 0;
 
     while (i < rows){
         while (j < cols){
-            printf("%c", matrix[i][j]);
+            printf("%d", matrix[i][j]);
             j += 1;
         }
         printf("\n");
@@ -69,7 +86,7 @@ void print_matrix(char **matrix, int rows, int cols) {
     }
 }
 
-void free_matrix(char **matrix, int rows){
+void free_matrix(int **matrix, int rows){
     int i = 0;
     while (i < rows){
         if (matrix[i]){
@@ -106,54 +123,55 @@ void build_rows_and_cols(char *buffer, int *rows, int *cols, ssize_t bytes_read)
     *cols = col_count;
 }
 
-
-
-
-int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read, char ***matrix, int *rows, int *cols) {
-    build_rows_and_cols(buffer, rows, cols, bytes_read);
-    printf("Rows: %d\nCols: %d\n", *rows, *cols);
-    if ((*matrix = malloc(sizeof(char*) * *rows)) == NULL) {
+void allocate_matrix(int ***matrix, int rows, int cols){
+    if ((*matrix = malloc(sizeof(char*) * rows)) == NULL) {
         perror("Error allocating memory for matrix\n");
-        return 1;
+        return;
     }
     int i = 0;
-    while (i < *rows){
-        if (((*matrix)[i] = malloc(*cols)) == NULL) {
+    while (i < rows){
+        if (((*matrix)[i] = malloc(cols)) == NULL) {
             perror("Error allocating memory for matrix row\n");
-            return 1;
+            return;
         }
         i += 1;
     }
+}
 
-    build_matrix(buffer, matrix, *rows, *cols, bytes_read);
-    print_matrix(*matrix, *rows, *cols);
+int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read, int ***matrix, int *rows, int *cols) {
+    build_rows_and_cols(buffer, rows, cols, bytes_read);
+    printf("Rows: %d\nCols: %d\n", *rows, *cols);
+
+    allocate_matrix(matrix, *rows, *cols);
+
+    build_matrix(buffer, *rows, *cols, bytes_read);
     return 0;
 }
 
-void check_matrix(char **matrix, int rows, int cols, int **result){
-    for (int col = 0; col < cols; col++) {
-      result[0][col] = (matrix[0][col] == 'o') ? 1 : 0;
-      result[col][0] = (matrix[col][0] == 'o') ? 1 : 0;
-    }
 
-    for (int i = 1; i < rows; i++) {
-        for (int j = 1; j < cols; j++) {
-            if (matrix[i][j] == 'o') {
-                int above = result[i - 1][j];
-                int left = result[i][j - 1];
-                int left_diagonal = result[i - 1][j - 1];
-                result[i][j] = above + left + left_diagonal + 1;
-            } else {
-                result[i][j] = 0;
-            }
-        }
-    }
+//  Old build_matrix function that uses a char matrix instead of an int matrix
+// void build_matrix(char *buffer, char ***matrix, int rows, int cols, ssize_t bytes_read){
+//     int k = 0;
+//     int i = 0;
+//     int j;
 
-    for (int k = 0; k < rows; k++) {
-        for (int l = 0; l < cols; l++) {
-        printf("%d ", result[k][l]);
-        }
-        printf("\n");
-    }
-
-}
+//     while (i < rows){
+//         j = 0;
+//         while (j < cols) {
+//             if (k < bytes_read) {
+//                 if (buffer[k] != '\n') {
+//                     (*matrix)[i][j] = buffer[k];
+//                 }
+//                 else {
+//                     j -= 1;
+//                 }
+//                 k += 1;
+//             }
+//             else {
+//                 (*matrix)[i][j] = ' ';
+//             }
+//             j += 1;
+//         }
+//         i += 1;
+//     }
+// }

@@ -9,7 +9,7 @@ int my_bsq(char *file) {
     }
     write(STDOUT_FILENO, buffer, bytes_read);
     printf("\n");
-    char **matrix;
+    int **matrix;
     int rows, cols;
     result = parse_buffer_to_matrix(buffer, bytes_read, &matrix, &rows, &cols);
     if (result){
@@ -17,15 +17,6 @@ int my_bsq(char *file) {
         free(buffer);
         return result;
     }
-    int **results = malloc(rows * sizeof(int *));
-    for (int i = 0; i < rows; i++) {
-        results[i] = malloc(cols * sizeof(int));
-    }
-    check_matrix(matrix, rows, cols, results);
-    for (int i = 0; i < rows; i++) {
-        free(results[i]);
-    }
-    free(results);
     free_matrix(matrix, rows);
     free(buffer);
     return 0;
