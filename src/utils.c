@@ -79,19 +79,18 @@ void free_matrix(char **matrix, int rows){
     }
 }
 
-int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read, char ***matrix, int *rows, int *cols) {
-    int row_count = 1; // We start with 1 as at this point at least one row is guaranteed from bytes read
-    int col_count = 0;
-    int max_col_count = 0;
-    int new_line = 0;
+void build_rows_and_cols(char *buffer, int *rows, int *cols, ssize_t bytes_read){
     int i = 0;
+    int new_line = 0;
+    int col_count = 0;
+    int row_count = 1;
 
     while (i < bytes_read){
         if (buffer[i] == '\n'){
             if (new_line == 0){
                 row_count += 1;
-                if (col_count > max_col_count){
-                    max_col_count = col_count;
+                if (col_count > *cols){
+                    *cols = col_count;
                 }
                 col_count = 0;
             }
@@ -103,23 +102,58 @@ int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read, char ***matrix, int
         }
         i += 1;
     }
-    i = 0;
     *rows = row_count;
-    *cols = max_col_count;
-    printf("Rows: %d\nCols: %d\nMax cols: %d\n", *rows, *cols, max_col_count);
-    if ((*matrix = malloc(sizeof(char*) * row_count)) == NULL) {
+    *cols = col_count;
+}
+
+
+
+
+int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read, char ***matrix, int *rows, int *cols) {
+    build_rows_and_cols(buffer, rows, cols, bytes_read);
+    printf("Rows: %d\nCols: %d\n", *rows, *cols);
+    if ((*matrix = malloc(sizeof(char*) * *rows)) == NULL) {
         perror("Error allocating memory for matrix\n");
         return 1;
     }
-    while (i < row_count){
-        if (((*matrix)[i] = malloc(max_col_count)) == NULL) {
+    int i = 0;
+    while (i < *rows){
+        if (((*matrix)[i] = malloc(*cols)) == NULL) {
             perror("Error allocating memory for matrix row\n");
             return 1;
         }
         i += 1;
     }
-    build_matrix(buffer, matrix, row_count, max_col_count, bytes_read);
-    print_matrix(*matrix, row_count, max_col_count);
-    free_matrix(*matrix, row_count);
+
+    build_matrix(buffer, matrix, *rows, *cols, bytes_read);
+    print_matrix(*matrix, *rows, *cols);
     return 0;
+}
+
+void check_matrix(char **matrix, int rows, int cols, int **result){
+    for (int col = 0; col < cols; col++) {
+      result[0][col] = (matrix[0][col] == 'o') ? 1 : 0;
+      result[col][0] = (matrix[col][0] == 'o') ? 1 : 0;
+    }
+
+    for (int i = 1; i < rows; i++) {
+        for (int j = 1; j < cols; j++) {
+            if (matrix[i][j] == 'o') {
+                int above = result[i - 1][j];
+                int left = result[i][j - 1];
+                int left_diagonal = result[i - 1][j - 1];
+                result[i][j] = above + left + left_diagonal + 1;
+            } else {
+                result[i][j] = 0;
+            }
+        }
+    }
+
+    for (int k = 0; k < rows; k++) {
+        for (int l = 0; l < cols; l++) {
+        printf("%d ", result[k][l]);
+        }
+        printf("\n");
+    }
+
 }
