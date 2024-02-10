@@ -24,8 +24,53 @@ int read_file(char *file, char **buffer, ssize_t *bytes_read){
         return 1;
     }
     printf("Read %zd bytes from file: '%s'\n", *bytes_read, file);
+    write(STDOUT_FILENO, buffer, bytes_read);
+    printf("\n");
+
     close(fd);
     return 0;
+}
+
+void build_rows_and_cols(char *buffer, int *rows, int *cols, ssize_t bytes_read){
+    int i = 0;
+    int new_line = 0;
+    int col_count = 0;
+    int row_count = 1;
+
+    while (i < bytes_read){
+        if (buffer[i] == '\n'){
+            if (new_line == 0){
+                row_count += 1;
+                if (col_count > *cols){
+                    *cols = col_count;
+                }
+                col_count = 0;
+            }
+            new_line = 1;
+        }
+        else {
+            new_line = 0;
+            col_count += 1;
+        }
+        i += 1;
+    }
+    *rows = row_count;
+    *cols = col_count;
+}
+
+void allocate_matrix(int ***matrix, int rows, int cols){
+    if ((*matrix = malloc(sizeof(char*) * rows)) == NULL) {
+        perror("Error allocating memory for matrix\n");
+        return;
+    }
+    int i = 0;
+    while (i < rows){
+        if (((*matrix)[i] = malloc(cols)) == NULL) {
+            perror("Error allocating memory for matrix row\n");
+            return;
+        }
+        i += 1;
+    }
 }
 
 void build_matrix(const char *buffer, int rows, int cols, ssize_t bytes_read){
@@ -96,51 +141,8 @@ void free_matrix(int **matrix, int rows){
     }
 }
 
-void build_rows_and_cols(char *buffer, int *rows, int *cols, ssize_t bytes_read){
-    int i = 0;
-    int new_line = 0;
-    int col_count = 0;
-    int row_count = 1;
-
-    while (i < bytes_read){
-        if (buffer[i] == '\n'){
-            if (new_line == 0){
-                row_count += 1;
-                if (col_count > *cols){
-                    *cols = col_count;
-                }
-                col_count = 0;
-            }
-            new_line = 1;
-        }
-        else {
-            new_line = 0;
-            col_count += 1;
-        }
-        i += 1;
-    }
-    *rows = row_count;
-    *cols = col_count;
-}
-
-void allocate_matrix(int ***matrix, int rows, int cols){
-    if ((*matrix = malloc(sizeof(char*) * rows)) == NULL) {
-        perror("Error allocating memory for matrix\n");
-        return;
-    }
-    int i = 0;
-    while (i < rows){
-        if (((*matrix)[i] = malloc(cols)) == NULL) {
-            perror("Error allocating memory for matrix row\n");
-            return;
-        }
-        i += 1;
-    }
-}
-
 int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read, int ***matrix, int *rows, int *cols) {
     build_rows_and_cols(buffer, rows, cols, bytes_read);
-    printf("Rows: %d\nCols: %d\n", *rows, *cols);
 
     allocate_matrix(matrix, *rows, *cols);
 

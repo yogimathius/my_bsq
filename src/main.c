@@ -7,8 +7,7 @@ int my_bsq(char *file) {
     if (result){
         return result;
     }
-    write(STDOUT_FILENO, buffer, bytes_read);
-    printf("\n");
+    
     int **matrix;
     int rows, cols;
     result = parse_buffer_to_matrix(buffer, bytes_read, &matrix, &rows, &cols);
