@@ -5,9 +5,11 @@ int my_bsq(char *file) {
     ssize_t bytes_read;
     int result = read_file(file, &buffer, &bytes_read);
     if (result){
+        perror("Error reading file");
         return result;
     }
-    
+    write(STDOUT_FILENO, buffer, bytes_read);
+    printf("\n");
     int **matrix;
     int rows, cols;
     result = parse_buffer_to_matrix(buffer, bytes_read, &matrix, &rows, &cols);

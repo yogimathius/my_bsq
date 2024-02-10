@@ -3,6 +3,7 @@
 
 #include <stdio.h>  /* printf(3) */
 #include <stdlib.h> /* EXIT_SUCCESS */
+#include <string.h> 
 #include <fcntl.h>  /* open(2) */
 #include <unistd.h>
 #include <sys/stat.h>
