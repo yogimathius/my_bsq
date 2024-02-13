@@ -4,6 +4,9 @@ typedef struct matrix {
     int **matrix;
     int rows;
     int cols;
+    int max_value;
+    int max_row;
+    int max_col;
 } matrix_t;
 
 int read_file(char *file, char **buffer, ssize_t *bytes_read){
@@ -72,30 +75,14 @@ void allocate_matrix(matrix_t *matrix){
     }
 }
 
-void build_largest_square(int **matrix, int maxRow, int maxCol, int maxValue) {
-    int i = maxRow;
-    int j = maxCol;
-    while (i > maxRow - maxValue){
-        while (j > maxCol - maxValue){
-            if (matrix[i][j] == 0) {
-                printf("WRONG CELL: %d, %d\n", i, j);
-            }
-            matrix[i][j] = 'x';
-            j -= 1;
-        }
-        j = maxCol;
-        i -= 1;
-    }
-}
-
 #define min(a, b) ((a < b) ? a : b)
 void build_matrix(const char *buffer, matrix_t *matrix, ssize_t bytes_read){
     int k = 0;
     int i = 0;
 
-    int maxValue = 0;
-    int maxRow = 0;
-    int maxCol = 0;
+    matrix->max_value = 0;
+    matrix->max_row = 0;
+    matrix->max_col = 0;
 
     while (i < matrix->rows){
         int j = 0;
@@ -105,10 +92,10 @@ void build_matrix(const char *buffer, matrix_t *matrix, ssize_t bytes_read){
             } else {
                 if (buffer[k] == '.') {
                     matrix->matrix[i][j] = min(min(matrix->matrix[i-1][j], matrix->matrix[i][j-1]), matrix->matrix[i-1][j-1]) + 1;
-                    if (matrix->matrix[i][j] > maxValue) {
-                        maxValue = matrix->matrix[i][j];
-                        maxRow = i;
-                        maxCol = j;
+                    if (matrix->matrix[i][j] > matrix->max_value) {
+                        matrix->max_value = matrix->matrix[i][j];
+                        matrix->max_row = i;
+                        matrix->max_col = j;
                     }
                 } else {
                     matrix->matrix[i][j] = 0;
@@ -125,11 +112,12 @@ void build_matrix(const char *buffer, matrix_t *matrix, ssize_t bytes_read){
         i += 1;
     }
 
-    printf("Max value: %d, Max row: %d, Max col: %d\n", maxValue, maxRow, maxCol);
-    // build_largest_square(matrix->matrix, maxRow, maxCol, maxValue);
+    printf("Max value: %d\n", matrix->max_value);
+    printf("Max row: %d\n", matrix->max_row);
+    printf("Max col: %d\n", matrix->max_col);
 }
 
-void print_matrix(matrix_t *matrix) {
+void print_matrix(const matrix_t *matrix) {
     int i = 0;
     int j = 0;
 
@@ -154,6 +142,77 @@ void free_matrix(matrix_t *matrix){
     }
 }
 
+void build_buffer_with_large_square(char *buffer, int max_row, int max_col, int max_value) {
+    int i = max_row;
+    int j = max_col;
+    while (i > max_row - max_value){
+        while (j > max_col - max_value){
+            buffer[i * (max_col + 1) + j] = 'x';
+            j -= 1;
+        }
+        j = max_col;
+        i -= 1;
+    }
+}
+
+void find_largest_square(char *buffer, const matrix_t *matrix) {
+    int i = 0;
+    int k = 0;
+
+    int row_lower_bound, row_upper_bound;
+    if (matrix->max_value + matrix->max_row > matrix->rows) {
+        row_lower_bound = matrix->max_row - matrix->max_value;
+        row_upper_bound = matrix->max_row;;
+    } else {
+        row_lower_bound = matrix->max_row;
+        row_upper_bound = matrix->max_row + matrix->max_value;
+    }
+
+    int col_lower_bound, col_upper_bound;
+    if (matrix->max_value + matrix->max_col > matrix->cols) {
+        col_lower_bound = matrix->max_col - matrix->max_value;
+        col_upper_bound = matrix->max_col;
+    } else {
+        col_lower_bound = matrix->max_col;
+        col_upper_bound = matrix->max_col + matrix->max_value;
+    }
+
+    printf("Row lower bound: %d\n", row_lower_bound);
+    printf("Row upper bound: %d\n", row_upper_bound);
+    printf("Col lower bound: %d\n", col_lower_bound);
+    printf("Col upper bound: %d\n", col_upper_bound);
+
+
+    while (i < matrix->rows){
+        int j = 0;
+        while (j < matrix->cols){
+            if (buffer[k] == '\n') {
+                j -= 1;
+            } else {
+                if (buffer[k] == '.' && i >= row_lower_bound && i <= row_upper_bound && j >= col_lower_bound && j <= col_upper_bound) {
+                    buffer[k] = 'x';
+                }
+            }
+            j += 1;
+            k += 1;
+        }
+        i += 1;
+    }
+}
+
+void print_buffer(char *buffer, ssize_t bytes_read) {
+    int i = 0;
+    while (i < bytes_read) {
+        if (buffer[i] == '\n') {
+            printf("\n");
+        } else {
+            printf("%c", buffer[i]);
+        }
+        i += 1;
+    }
+}
+
+
 int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read) {
     matrix_t *matrix = malloc(sizeof(matrix_t));
     matrix->rows = 10;
@@ -169,7 +228,9 @@ int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read) {
 
     build_matrix(buffer, matrix, bytes_read);
 
-    print_matrix(matrix);
+    find_largest_square(buffer, matrix);
+
+    print_buffer(buffer, bytes_read);
 
     free_matrix(matrix);
 
