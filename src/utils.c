@@ -66,6 +66,7 @@ void allocate_matrix(int ***matrix, int rows, int cols){
     }
 }
 
+#define min(a, b) ((a < b) ? a : b)
 void build_matrix(const char *buffer, int **result, int rows, int cols, ssize_t bytes_read){
     int k = 0;
     int i = 0;
@@ -74,17 +75,14 @@ void build_matrix(const char *buffer, int **result, int rows, int cols, ssize_t 
         int j = 0;
         while (j < cols) {
             if (i == 0 || j == 0) {
-                result[i][j] = (buffer[k] == 'o') ? 1 : 0;
+                result[i][j] = (buffer[k] == 'o') ? 0 : 1;
             } else {
-                if (buffer[k] == 'o') {
-                    int above = result[i - 1][j];
-                    int left = result[i][j - 1];
-                    int left_diagonal = result[i - 1][j - 1];
-                    result[i][j] = above + left + left_diagonal + 1;
+                if (buffer[k] == '.') {
+                    result[i][j] = min(min(result[i-1][j], result[i][j-1]), result[i-1][j-1]) + 1;
                 } else {
                     result[i][j] = 0;
                 }
-            } 
+            }
             if (k < bytes_read) {
                 if (buffer[k] == '\n') {
                     j -= 1;
