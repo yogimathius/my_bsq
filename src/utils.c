@@ -77,6 +77,8 @@ void allocate_matrix(matrix_t *matrix){
 
 #define min(a, b) ((a < b) ? a : b)
 void build_matrix(const char *buffer, matrix_t *matrix, ssize_t bytes_read){
+    allocate_matrix(matrix);
+
     int k = 0;
     int i = 0;
 
@@ -206,16 +208,14 @@ void print_buffer(char *buffer, ssize_t bytes_read) {
 
 int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read) {
     matrix_t *matrix = malloc(sizeof(matrix_t));
-    matrix->rows = 10;
-    matrix->cols = 10;
+    matrix->rows = 0;
+    matrix->cols = 0;
 
     int response = get_rows_and_cols(buffer, matrix, &bytes_read);
     if (response == 1) {
         free(matrix);
         return 1;
     }
-
-    allocate_matrix(matrix);
 
     build_matrix(buffer, matrix, bytes_read);
 
