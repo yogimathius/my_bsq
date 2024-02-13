@@ -32,7 +32,7 @@ int read_file(char *file, char **buffer, ssize_t *bytes_read){
         close(fd);
         return 1;
     }
-    printf("Read %zd bytes from file: '%s'\n", *bytes_read, file);
+    // printf("Read %zd bytes from file: '%s'\n", *bytes_read, file);
 
     close(fd);
     return 0;
@@ -48,7 +48,7 @@ int get_rows_and_cols(char *buffer, matrix_t *matrix, ssize_t *bytes_read) {
     char size_str[16];
     strncpy(size_str, buffer, newline_ptr - buffer);
     size_str[newline_ptr - buffer] = '\0';
-    printf("Size string: %s\n", size_str);
+    // printf("Size string: %s\n", size_str);
     matrix->rows = atoi(size_str);
     matrix->cols = matrix->rows;
 
@@ -56,7 +56,7 @@ int get_rows_and_cols(char *buffer, matrix_t *matrix, ssize_t *bytes_read) {
 
     memmove(buffer, buffer + newline_index + 1, *bytes_read - newline_index - 1);
     *bytes_read -= newline_index + 1;
-    printf("Rows: %d, Cols: %d\n", matrix->rows, matrix->cols);
+    // printf("Rows: %d, Cols: %d\n", matrix->rows, matrix->cols);
     return 0;
 }
 
@@ -114,9 +114,9 @@ void build_matrix(const char *buffer, matrix_t *matrix, ssize_t bytes_read){
         i += 1;
     }
 
-    printf("Max value: %d\n", matrix->max_value);
-    printf("Max row: %d\n", matrix->max_row);
-    printf("Max col: %d\n", matrix->max_col);
+    // printf("Max value: %d\n", matrix->max_value);
+    // printf("Max row: %d\n", matrix->max_row);
+    // printf("Max col: %d\n", matrix->max_col);
 }
 
 void print_matrix(const matrix_t *matrix) {
@@ -172,10 +172,10 @@ void find_largest_square(char *buffer, const matrix_t *matrix) {
     
     get_boundaries(matrix, &row_lower_bound, &row_upper_bound, &col_lower_bound, &col_upper_bound);
 
-    printf("Row lower bound: %d\n", row_lower_bound);
-    printf("Row upper bound: %d\n", row_upper_bound);
-    printf("Col lower bound: %d\n", col_lower_bound);
-    printf("Col upper bound: %d\n", col_upper_bound);
+    // printf("Row lower bound: %d\n", row_lower_bound);
+    // printf("Row upper bound: %d\n", row_upper_bound);
+    // printf("Col lower bound: %d\n", col_lower_bound);
+    // printf("Col upper bound: %d\n", col_upper_bound);
 
     while (i < matrix->rows){
         int j = 0;
@@ -221,7 +221,7 @@ int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read) {
 
     find_largest_square(buffer, matrix);
 
-    print_buffer(buffer, bytes_read);
+    // print_buffer(buffer, bytes_read);
 
     free_matrix(matrix);
 
