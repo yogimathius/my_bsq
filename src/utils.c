@@ -142,16 +142,21 @@ void free_matrix(matrix_t *matrix){
     }
 }
 
-void build_buffer_with_large_square(char *buffer, int max_row, int max_col, int max_value) {
-    int i = max_row;
-    int j = max_col;
-    while (i > max_row - max_value){
-        while (j > max_col - max_value){
-            buffer[i * (max_col + 1) + j] = 'x';
-            j -= 1;
-        }
-        j = max_col;
-        i -= 1;
+void get_boundaries(const matrix_t *matrix, int *row_lower_bound, int *row_upper_bound, int *col_lower_bound, int *col_upper_bound) {
+    if (matrix->max_value + matrix->max_row > matrix->rows) {
+        *row_lower_bound = matrix->max_row - matrix->max_value;
+        *row_upper_bound = matrix->max_row;;
+    } else {
+        *row_lower_bound = matrix->max_row;
+        *row_upper_bound = matrix->max_row + matrix->max_value;
+    }
+
+    if (matrix->max_value + matrix->max_col > matrix->cols) {
+        *col_lower_bound = matrix->max_col - matrix->max_value;
+        *col_upper_bound = matrix->max_col;
+    } else {
+        *col_lower_bound = matrix->max_col;
+        *col_upper_bound = matrix->max_col + matrix->max_value;
     }
 }
 
@@ -160,28 +165,15 @@ void find_largest_square(char *buffer, const matrix_t *matrix) {
     int k = 0;
 
     int row_lower_bound, row_upper_bound;
-    if (matrix->max_value + matrix->max_row > matrix->rows) {
-        row_lower_bound = matrix->max_row - matrix->max_value;
-        row_upper_bound = matrix->max_row;;
-    } else {
-        row_lower_bound = matrix->max_row;
-        row_upper_bound = matrix->max_row + matrix->max_value;
-    }
 
     int col_lower_bound, col_upper_bound;
-    if (matrix->max_value + matrix->max_col > matrix->cols) {
-        col_lower_bound = matrix->max_col - matrix->max_value;
-        col_upper_bound = matrix->max_col;
-    } else {
-        col_lower_bound = matrix->max_col;
-        col_upper_bound = matrix->max_col + matrix->max_value;
-    }
+    
+    get_boundaries(matrix, &row_lower_bound, &row_upper_bound, &col_lower_bound, &col_upper_bound);
 
     printf("Row lower bound: %d\n", row_lower_bound);
     printf("Row upper bound: %d\n", row_upper_bound);
     printf("Col lower bound: %d\n", col_lower_bound);
     printf("Col upper bound: %d\n", col_upper_bound);
-
 
     while (i < matrix->rows){
         int j = 0;
@@ -211,7 +203,6 @@ void print_buffer(char *buffer, ssize_t bytes_read) {
         i += 1;
     }
 }
-
 
 int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read) {
     matrix_t *matrix = malloc(sizeof(matrix_t));
