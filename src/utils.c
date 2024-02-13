@@ -1,5 +1,11 @@
 #include <my_bsq.h>
 
+typedef struct matrix {
+    int **matrix;
+    int rows;
+    int cols;
+} matrix_t;
+
 int read_file(char *file, char **buffer, ssize_t *bytes_read){
     struct stat s;
     int fd = open(file, O_RDONLY);
@@ -29,7 +35,7 @@ int read_file(char *file, char **buffer, ssize_t *bytes_read){
     return 0;
 }
 
-int build_rows_and_cols(char *buffer, int *rows, int *cols, ssize_t *bytes_read) {
+int get_rows_and_cols(char *buffer, matrix_t *matrix, ssize_t *bytes_read) {
     const char *newline_ptr = strchr(buffer, '\n');
     if (newline_ptr == NULL) {
         printf("No newline found in buffer\n");
@@ -39,26 +45,26 @@ int build_rows_and_cols(char *buffer, int *rows, int *cols, ssize_t *bytes_read)
     char size_str[16];
     strncpy(size_str, buffer, newline_ptr - buffer);
     size_str[newline_ptr - buffer] = '\0';
-
-    *rows = atoi(size_str);
-    *cols = *rows;
+    printf("Size string: %s\n", size_str);
+    matrix->rows = atoi(size_str);
+    matrix->cols = matrix->rows;
 
     int newline_index = (int)(newline_ptr - buffer);
 
     memmove(buffer, buffer + newline_index + 1, *bytes_read - newline_index - 1);
     *bytes_read -= newline_index + 1;
-    printf("Rows: %d, Cols: %d\n", *rows, *cols);
+    printf("Rows: %d, Cols: %d\n", matrix->rows, matrix->cols);
     return 0;
 }
 
-void allocate_matrix(int ***matrix, int rows, int cols){
-    if ((*matrix = malloc(sizeof(char*) * rows)) == NULL) {
+void allocate_matrix(matrix_t *matrix){
+    if ((matrix->matrix = malloc(sizeof(char*) * matrix->rows)) == NULL) {
         perror("Error allocating memory for matrix\n");
         return;
     }
     int i = 0;
-    while (i < rows){
-        if (((*matrix)[i] = malloc(cols * sizeof(int))) == NULL) {
+    while (i < matrix->rows){
+        if (((matrix->matrix)[i] = malloc(matrix->cols * sizeof(int))) == NULL) {
             perror("Error allocating memory for matrix row\n");
             return;
         }
@@ -66,23 +72,48 @@ void allocate_matrix(int ***matrix, int rows, int cols){
     }
 }
 
+void build_largest_square(int **matrix, int maxRow, int maxCol, int maxValue) {
+    int i = maxRow;
+    int j = maxCol;
+    while (i > maxRow - maxValue){
+        while (j > maxCol - maxValue){
+            if (matrix[i][j] == 0) {
+                printf("WRONG CELL: %d, %d\n", i, j);
+            }
+            matrix[i][j] = 'x';
+            j -= 1;
+        }
+        j = maxCol;
+        i -= 1;
+    }
+}
+
 #define min(a, b) ((a < b) ? a : b)
-void build_matrix(const char *buffer, int **result, int rows, int cols, ssize_t bytes_read){
+void build_matrix(const char *buffer, matrix_t *matrix, ssize_t bytes_read){
     int k = 0;
     int i = 0;
 
-    while (i < rows){
+    int maxValue = 0;
+    int maxRow = 0;
+    int maxCol = 0;
+
+    while (i < matrix->rows){
         int j = 0;
-        while (j < cols) {
+        while (j < matrix->cols) {
             if (i == 0 || j == 0) {
-                result[i][j] = (buffer[k] == 'o') ? 0 : 1;
+                matrix->matrix[i][j] = (buffer[k] == 'o') ? 0 : 1;
             } else {
                 if (buffer[k] == '.') {
-                    result[i][j] = min(min(result[i-1][j], result[i][j-1]), result[i-1][j-1]) + 1;
+                    matrix->matrix[i][j] = min(min(matrix->matrix[i-1][j], matrix->matrix[i][j-1]), matrix->matrix[i-1][j-1]) + 1;
+                    if (matrix->matrix[i][j] > maxValue) {
+                        maxValue = matrix->matrix[i][j];
+                        maxRow = i;
+                        maxCol = j;
+                    }
                 } else {
-                    result[i][j] = 0;
+                    matrix->matrix[i][j] = 0;
                 }
-            }
+            } 
             if (k < bytes_read) {
                 if (buffer[k] == '\n') {
                     j -= 1;
@@ -93,15 +124,18 @@ void build_matrix(const char *buffer, int **result, int rows, int cols, ssize_t 
         }
         i += 1;
     }
+
+    printf("Max value: %d, Max row: %d, Max col: %d\n", maxValue, maxRow, maxCol);
+    // build_largest_square(matrix->matrix, maxRow, maxCol, maxValue);
 }
 
-void print_matrix(int **matrix, int rows, int cols) {
+void print_matrix(matrix_t *matrix) {
     int i = 0;
     int j = 0;
 
-    while (i < rows){
-        while (j < cols){
-            printf("%d", matrix[i][j]);
+    while (i < matrix->rows){
+        while (j < matrix->cols){
+            printf("%d", matrix->matrix[i][j]);
             j += 1;
         }
         printf("\n");
@@ -110,27 +144,35 @@ void print_matrix(int **matrix, int rows, int cols) {
     }
 }
 
-void free_matrix(int **matrix, int rows){
+void free_matrix(matrix_t *matrix){
     int i = 0;
-    while (i < rows){
-        if (matrix[i]){
-            free(matrix[i]);
+    while (i < matrix->rows){
+        if (matrix->matrix[i]){
+            free(matrix->matrix[i]);
         }
         i += 1;
     }
 }
 
-int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read, int ***matrix, int *rows, int *cols) {
-    int response = build_rows_and_cols(buffer, rows, cols, &bytes_read);
+int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read) {
+    matrix_t *matrix = malloc(sizeof(matrix_t));
+    matrix->rows = 10;
+    matrix->cols = 10;
+
+    int response = get_rows_and_cols(buffer, matrix, &bytes_read);
     if (response == 1) {
+        free(matrix);
         return 1;
     }
 
-    allocate_matrix(matrix, *rows, *cols);
+    allocate_matrix(matrix);
 
-    build_matrix(buffer, *matrix, *rows, *cols, bytes_read);
+    build_matrix(buffer, matrix, bytes_read);
 
-    print_matrix(*matrix, *rows, *cols);
+    print_matrix(matrix);
+
+    free_matrix(matrix);
+
     return 0;
 }
 

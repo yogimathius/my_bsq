@@ -10,15 +10,12 @@ int my_bsq(char *file) {
     }
     write(STDOUT_FILENO, buffer, bytes_read);
     printf("\n");
-    int **matrix;
-    int rows, cols;
-    result = parse_buffer_to_matrix(buffer, bytes_read, &matrix, &rows, &cols);
+    result = parse_buffer_to_matrix(buffer, bytes_read);
     if (result){
         printf("Failed to parse buffer to matrix.\n");
         free(buffer);
         return result;
     }
-    free_matrix(matrix, rows);
     free(buffer);
     return 0;
 }

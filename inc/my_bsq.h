@@ -13,7 +13,6 @@ my_bsq -- finds and prints the biggest square in a map\n\
 my_bsq [file.txt] ...\n"
 
 int read_file(char *filename, char **buffer, ssize_t *bytes_read);
-int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read, int ***matrix, int *rows, int *cols);
-void free_matrix(int **matrix, int rows);
+int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read);
 
 #endif
