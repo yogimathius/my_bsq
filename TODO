@@ -1,0 +1,16 @@
+[0/3] TODO
+    [ ] OOP with pub class/struct
+    [ ] Multi-Threaded && Thread Safe
+    [ ] Test Suite
+
+[0/3] STRETCH GOALS
+    [ ] Add colors
+    [ ] Add option for output file, take multiple map at once..
+    [ ] Add man page
+
+[0/5] HELPER
+    [ ] my_strchr
+    [ ] my_atoi
+    [ ] my_strcpy
+    [ ] my_memmove
+    [ ] my_dprintf

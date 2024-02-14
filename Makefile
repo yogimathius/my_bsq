@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -Werror
+CFLAGS=-Wall -Wextra -Werror #-fsanitize=address -g3
 BIN=my_bsq
 SRC=src/main.c src/utils.c
 INC=inc
