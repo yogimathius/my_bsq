@@ -154,14 +154,3 @@ new()
 const struct MatrixClass /*matrixProxy*/ Matrix = {
   .new = &new,
 };
-
-int parse_buffer(char *buffer, ssize_t bytes_read) {
-    struct Matrix matrix = Matrix.new();
-    
-    matrix.get_size(buffer, &matrix, &bytes_read);
-    matrix.build(buffer, &matrix, bytes_read);
-    matrix.fill_largest_square(buffer, &matrix);
-    print_buffer(buffer, bytes_read);
-    matrix.free_matrix(&matrix);
-    return 0;
-}

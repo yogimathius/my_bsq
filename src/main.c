@@ -10,11 +10,17 @@ int my_bsq(const char *file){
     }
     write(STDOUT_FILENO, buffer, bytes_read);
     printf("\n");
-    result = parse_buffer(buffer, bytes_read);
-    if (result){
-        printf("Failed to parse buffer to matrix.\n");
-    }
-    return result;
+
+    struct Matrix matrix = Matrix.new();
+    
+    matrix.get_size(buffer, &matrix, &bytes_read);
+    matrix.build(buffer, &matrix, bytes_read);
+    matrix.fill_largest_square(buffer, &matrix);
+    print_buffer(buffer, bytes_read);
+    matrix.free_matrix(&matrix);
+
+    free(buffer);
+    return 0;
 }
 
 int main(const int ac , const char **av){
