@@ -62,11 +62,16 @@ int get_rows_and_cols(char *buffer, matrix_t *m, ssize_t *bytes_read) {
         printf("No newline found in buffer\n");
         return 1;
     }
-    char size_str[SIZE];
-    strncpy(size_str, buffer, LF - buffer);
-    size_str[LF - buffer] = '\0';
-    m->cols = m->rows = atoi(size_str);
-    int newline_index = (int)(LF - buffer);
+
+    char size_str[16];
+    strncpy(size_str, buffer, newline_ptr - buffer);
+    size_str[newline_ptr - buffer] = '\0';
+
+    matrix->rows = atoi(size_str);
+    matrix->cols = matrix->rows;
+
+    int newline_index = (int)(newline_ptr - buffer);
+
     memmove(buffer, buffer + newline_index + 1, *bytes_read - newline_index - 1);
     *bytes_read -= newline_index + 1;
     return 0;
@@ -136,7 +141,6 @@ matrix_t *build(char *buffer, ssize_t bytes_read){
         }
         i += 1;
     }
-    return m;
 }
 
 void free_matrix(matrix_t *m){
@@ -168,26 +172,23 @@ void get_boundaries(matrix_t *m){
     }
 }
 
-void draw(char *buffer, matrix_t *m){
+void find_largest_square(char *buffer, const matrix_t *matrix) {
     int i = 0;
     int k = 0;
-    get_boundaries(m);
-    while (i < m->rows){
+
+    
+    int row_lower_bound = matrix->max_row - matrix->max_value + 1;
+    int col_lower_bound = matrix->max_col - matrix->max_value + 1;
+
+    while (i < matrix->rows){
         int j = 0;
         while (j < m->cols){
             if (buffer[k] == '\n') {
                 j -= 1;
-            }
-            else {
-                if (buffer[k] == '.' && i >= m->row_lower_bound && i <= m->row_upper_bound && j >= m->col_lower_bound && j <= m->col_upper_bound) {
-                    buffer[k] = 'x';
-                }
-            }
-            j += 1;
-            k += 1;
+            } else {
+                if (buffer[k] == '.' && i >= row_lower_bound && i <=  matrix->max_row && j >= col_lower_bound && j <= matrix->max_col) {
         }
         i += 1;
-    }
 }
 
 int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read) {
