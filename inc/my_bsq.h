@@ -25,7 +25,7 @@ struct Matrix {
   int max_col;
   int (*const read)(const char *filename, struct Matrix* self);
   int (*const get_size)(struct Matrix* self);
-  void (*const allocate)(struct Matrix* self);
+  void (*const alloc)(struct Matrix* self);
   void (*const build)(const struct Matrix* self);
   void (*const debug)(const struct Matrix* self);
   void (*const print)(const struct Matrix* self);

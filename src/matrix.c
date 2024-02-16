@@ -177,7 +177,7 @@ _new(){
     .max_col = 0,
     .read = (void*)&_read,
     .get_size = (void*)&_get_size,
-    .allocate = (void*)&_alloc,
+    .alloc = (void*)&_alloc,
     .build = (void*)&_build,
     .debug = (void*)&_debug,
     .print = (void*)&_print,
