@@ -9,7 +9,6 @@ int my_bsq(const char *file){
         return result;
     }
     matrix.bsq(&matrix);
-    matrix.print(&matrix);
     matrix.free(&matrix);
     return 0;
 }

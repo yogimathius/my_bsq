@@ -2,6 +2,10 @@
 
 #define min(a, b) ((a < b) ? a : b)
 
+static void _print(const struct Matrix* self){
+    write(STDOUT_FILENO, self->buffer, self->size);
+}
+
 static int
 _read(const char *file, struct Matrix* self){
     struct stat s;
@@ -159,10 +163,7 @@ _bsq(struct Matrix* self){
         }
         i += 1;
     }
-}
-
-static void _print(const struct Matrix* self){
-    write(STDOUT_FILENO, self->buffer, self->size);
+    _print(self);
 }
 
 static struct Matrix
