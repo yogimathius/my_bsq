@@ -8,7 +8,9 @@ int my_bsq(const char *file){
         perror("Error reading file");
         return result;
     }
-    result = parse_buffer_to_matrix(buffer, bytes_read);
+    write(STDOUT_FILENO, buffer, bytes_read);
+    printf("\n");
+    result = parse_buffer(buffer, bytes_read);
     if (result){
         printf("Failed to parse buffer to matrix.\n");
     }
