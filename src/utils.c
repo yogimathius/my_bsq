@@ -102,14 +102,13 @@ matrix_t *alloc(char *buffer, ssize_t bytes_read){
     return m;
 }
 
-matrix_t *build(char *buffer, ssize_t bytes_read){
-    matrix_t *m = alloc(buffer, bytes_read);
-    if (m == NULL){
-        return NULL;
-    }
-    m->max_val = 0;
-    m->max_row = 0;
-    m->max_col = 0;
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+void build_matrix(const char *buffer, matrix_t *matrix, ssize_t bytes_read){
+    allocate_matrix(matrix);
+
     int k = 0;
     int i = 0;
     while (i < m->rows){
