@@ -9,30 +9,28 @@
 #include <sys/stat.h>
 
 #define SIZE 16
-#define min(a, b) ((a < b) ? a : b)
-// ^ macros with logic strictly forbidden
 
 #define HELP "\
 my_bsq -- finds and prints the biggest square in a map\n\
 my_bsq [file.txt] ...\n"
 
-int read_file(char *filename, char **buffer, ssize_t *bytes_read);
-void print_buffer(const char *buffer, ssize_t bytes_read);
-int min(int a, int b);
-
 struct Matrix {
-    int **matrix;
-    int rows;
-    int cols;
-    int max_value;
-    int max_row;
-    int max_col;
-    int (* const get_size)(char *buffer, struct Matrix* self, ssize_t *bytes_read);
-    void (* const allocate)(struct Matrix* self);
-    void (* const build)(const char *buffer, struct Matrix* self, ssize_t bytes_read);
-    void (* const print)(struct Matrix* self);
-    void (* const free_matrix)(struct Matrix* self);
-    void (* const fill_largest_square)(char *buffer, struct Matrix* self);
+  ssize_t size;
+  char *buffer;
+  int **matrix;
+  int rows;
+  int cols;
+  int max_val;
+  int max_row;
+  int max_col;
+  int (*const read)(const char *filename, struct Matrix* self);
+  int (*const get_size)(struct Matrix* self);
+  void (*const allocate)(struct Matrix* self);
+  void (*const build)(const struct Matrix* self);
+  void (*const debug)(const struct Matrix* self);
+  void (*const print)(const struct Matrix* self);
+  void (*const free)(struct Matrix* self);
+  void (*const bsq)(struct Matrix* self);/* fill_largest_square */
 };
 
 extern const struct MatrixClass {

@@ -1,25 +1,16 @@
 #include <my_bsq.h>
 
 int my_bsq(const char *file){
-    char *buffer;
-    ssize_t bytes_read;
-    int result = read_file(file, &buffer, &bytes_read);
+    struct Matrix matrix = Matrix.new();
+
+    int result = matrix.read(file, &matrix);
     if (result){
         perror("Error reading file");
         return result;
     }
-    write(STDOUT_FILENO, buffer, bytes_read);
-    printf("\n");
-
-    struct Matrix matrix = Matrix.new();
-    
-    matrix.get_size(buffer, &matrix, &bytes_read);
-    matrix.build(buffer, &matrix, bytes_read);
-    matrix.fill_largest_square(buffer, &matrix);
-    print_buffer(buffer, bytes_read);
-    matrix.free_matrix(&matrix);
-
-    free(buffer);
+    matrix.bsq(&matrix);
+    matrix.print(&matrix);
+    matrix.free(&matrix);
     return 0;
 }
 
