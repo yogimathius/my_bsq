@@ -171,7 +171,7 @@ void get_boundaries(matrix_t *m){
     }
 }
 
-void find_largest_square(char *buffer, const matrix_t *matrix) {
+void fill_largest_square(char *buffer, const matrix_t *matrix) {
     int i = 0;
     int k = 0;
 
@@ -199,5 +199,14 @@ int parse_buffer_to_matrix(char *buffer, ssize_t bytes_read) {
         free(buffer);
         return 0;
     }
-    return 1;
+
+    build_matrix(buffer, matrix, bytes_read);
+
+    fill_largest_square(buffer, matrix);
+
+    print_buffer(buffer, bytes_read);
+
+    free_matrix(matrix);
+
+    return 0;
 }
