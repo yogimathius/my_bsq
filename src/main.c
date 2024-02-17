@@ -2,15 +2,10 @@
 
 int my_bsq(const char *file){
     struct Matrix matrix = Matrix.new();
-
-    int result = matrix.read(file, &matrix);
-    if (result){
-        perror("Error reading file");
-        return result;
-    }
-    matrix.bsq(&matrix);
-    matrix.free(&matrix);
-    return 0;
+    matrix.read(file);
+    matrix.bsq();
+    matrix.free();
+    return EXIT_SUCCESS;
 }
 
 int main(const int ac , const char **av){

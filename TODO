@@ -1,7 +1,8 @@
-[0/3] TODO
-    [ ] OOP with pub class/struct
+[2/4] TODO
+    [X] OOP with pub class/struct
     [ ] Multi-Threaded && Thread Safe
-    [ ] Test Suite
+    [X] Test Suite
+    [ ] Memory Pool
 
 [0/3] STRETCH GOALS
     [ ] Add colors

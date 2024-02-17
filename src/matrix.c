@@ -2,30 +2,33 @@
 
 #define min(a, b) ((a < b) ? a : b)
 
-static void _print(const struct Matrix* self){
-    write(STDOUT_FILENO, self->buffer, self->size);
+static struct Matrix* self;
+
+static void _print(){
+    dprintf(STDOUT_FILENO, "%.*s", (int)self->size, self->buffer);
 }
 
 static int
-_read(const char *file, struct Matrix* self){
+_read(const char *file){
     struct stat s;
     int fd = open(file, O_RDONLY);
     if (fd == -1){
-        perror("Error opening the file");
+        dprintf(2, "Error opening the file");
         return 1;
     }
     if (fstat(fd, &s) == -1){
-        perror("Error getting file size");
+        dprintf(2, "Error stat file size");
         close(fd);
         return 1;
     }
+    self -= __MatrixClass_self_alignement;
     if ((self->buffer = malloc(s.st_size)) == NULL){
-        perror("Error allocating memory for buffer");
+        dprintf(2, "Error allocating memory for buffer");
         close(fd);
         return 1;
     }
     if ((self->size = read(fd, self->buffer, s.st_size)) == -1) {
-        printf("Failed to read file: '%s'\n", file);
+        dprintf(2, "Failed to read file: '%s'\n", file);
         free(self->buffer);
         close(fd);
         return 1;
@@ -35,7 +38,7 @@ _read(const char *file, struct Matrix* self){
 }
 
 static int
-_get_size(struct Matrix* self){
+_get_size(){
     const char *LF = strchr(self->buffer, '\n');
     if (LF == NULL){
         printf("No newline found in buffer\n");
@@ -54,16 +57,16 @@ _get_size(struct Matrix* self){
 }
 
 static void
-_alloc(struct Matrix* self){
+_alloc(){
     _get_size(self);
     if ((self->matrix = malloc(sizeof(char*) * self->rows)) == NULL) {
-        perror("Error allocating memory for matrix\n");
+        dprintf(2, "Error allocating memory for matrix\n");
         return;
     }
     int i = 0;
     while (i < self->rows){
         if (((self->matrix)[i] = malloc(self->cols * sizeof(int))) == NULL) {
-            perror("Error allocating memory for matrix row\n");
+            dprintf(2, "Error allocating memory for matrix row\n");
             return;
         }
         i += 1;
@@ -71,7 +74,7 @@ _alloc(struct Matrix* self){
 }
 
 static void
-_build(struct Matrix* self){
+_build(){
     int k = 0;
     int i = 0;
 
@@ -111,7 +114,7 @@ _build(struct Matrix* self){
 }
 
 static void
-_debug(const struct Matrix* self){
+_debug(){
     int i = 0;
     int j = 0;
 
@@ -127,7 +130,7 @@ _debug(const struct Matrix* self){
 }
 
 static void 
-_free(struct Matrix* self){
+_free(){
     free(self->buffer);
     int i = 0;
     while (i < self->rows){
@@ -140,7 +143,7 @@ _free(struct Matrix* self){
 }
 
 static void
-_bsq(struct Matrix* self){
+_bsq(){
     int i = 0;
     int k = 0;
     _build(self);
@@ -150,11 +153,11 @@ _bsq(struct Matrix* self){
     while (i < self->rows){
         int j = 0;
         while (j < self->cols){
-            if (self->buffer[k] == '\n') {
+            if (self->buffer[k] == '\n'){
                 j -= 1;
             }
             else {
-                if (self->buffer[k] == '.' && i >= row_lower_bound && i <=  self->max_row && j >= col_lower_bound && j <= self->max_col) {
+                if (self->buffer[k] == '.' && i >= row_lower_bound && i <=  self->max_row && j >= col_lower_bound && j <= self->max_col){
                     self->buffer[k] = 'x';
                 }
             }
@@ -168,7 +171,7 @@ _bsq(struct Matrix* self){
 
 static struct Matrix
 _new(){
-  return (struct Matrix) {
+  return *(self = &(struct Matrix) {
     .matrix = NULL,
     .rows = 0,
     .cols = 0,
@@ -183,9 +186,9 @@ _new(){
     .print = (void*)&_print,
     .free = (void*)&_free,
     .bsq = (void*)&_bsq
-  };
+  });
 }
 
-const struct MatrixClass /*matrixProxy*/ Matrix = {
+const struct MatrixClass Matrix = {
   .new = &_new,
 };
