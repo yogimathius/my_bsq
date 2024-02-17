@@ -11,9 +11,9 @@ The challenges were to understand and use Dynamic programming, simulate C++ OOP 
 <!-- TODO - How have you solved the problem? -->
 my_bsq -- finds and prints the biggest square in a map
 
-1.Retreive size of input map from 1st line.
-2.Build a 2D matrix for dynamic programming.
-2.Write result into a a char buffer.
+- 1.Retreive size of input map from 1st line.
+- 2.Build a 2D matrix for dynamic programming.
+- 2.Write result into a a char buffer.
 
 ## Installation
 <!-- TODO - How to install your project? npm install? make? make re? -->
@@ -35,4 +35,4 @@ This is a cli app which expect a single filename containing a valid map as param
 `aubin_t`
 
 <span><i>Made at <a href='https://qwasar.io'>Qwasar SV -- Software Engineering School</a></i></span>
-<span><img alt='Qwasar SV -- Software Engineering School's Logo' src='https://storage.googleapis.com/qwasar-public/qwasar-logo_50x50.png' width='20px' /></span>
+<span><img alt='Qwasar' src='https://storage.googleapis.com/qwasar-public/qwasar-logo_50x50.png' width='20px' /></span>
