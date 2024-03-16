@@ -13,17 +13,17 @@ _read(const char *file){
     struct stat s;
     int fd = open(file, O_RDONLY);
     if (fd == -1){
-        dprintf(2, "Error opening the file");
+        dprintf(2, "Error opening file: '%s'\n", file);
         return 1;
     }
     if (fstat(fd, &s) == -1){
-        dprintf(2, "Error stat file size");
+        dprintf(2, "Error stat size file: '%s'\n", file);
         close(fd);
         return 1;
     }
     self -= __MatrixClass_self_alignement;
     if ((self->buffer = malloc(s.st_size)) == NULL){
-        dprintf(2, "Error allocating memory for buffer");
+        dprintf(2, "Error allocating memory for buffer\n");
         close(fd);
         return 1;
     }

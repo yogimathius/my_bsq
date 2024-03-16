@@ -18,10 +18,10 @@ my_bsq -- finds and prints the biggest square in a map
 ## Installation
 <!-- TODO - How to install your project? npm install? make? make re? -->
 Build system dependency: `make`
-`make`: build target `my_bsq`.
-`make clean`: clean temporary obj files.
-`make fclean`: clean temporary obj files and target.
-`make re`: clean and rebuild the program from scratch.
+- `make`: build target `my_bsq`.
+- `make clean`: clean temporary obj files.
+- `make fclean`: clean temporary obj files and target.
+- `make re`: clean and rebuild the program from scratch.
 
 ## Usage
 <!-- TODO - How does it work? -->

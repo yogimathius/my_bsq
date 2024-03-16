@@ -2,7 +2,10 @@
 
 int my_bsq(const char *file){
     struct Matrix matrix = Matrix.new();
-    matrix.read(file);
+    if (matrix.read(file)){
+        
+        return EXIT_FAILURE;
+    }
     matrix.bsq();
     matrix.free();
     return EXIT_SUCCESS;
